@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Reminder</title>
+</head>
+<body>
+    <h1 id="reminder-message">Waiting to start...</h1>
+
+    <script>
+        function startReminder(startTime, endTime) {
+            const start = new Date(`1970-01-01T${startTime}:00`);
+            const end = new Date(`1970-01-01T${endTime}:00`);
+            const interval = 15 * 60 * 1000; // 15 minutes in milliseconds
+            const reminderMessage = document.getElementById('reminder-message');
+
+            function beep() {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+               oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+              oscillator.detune.value = 100;
+                oscillator.start(0);
+                  gainNode.gain.value = .02;
+  gainNode.gain.minValue = .02;
+  gainNode.gain.maxValue = .02;
+                oscillator.frequency.value = 300 // frequency in Hz
+               
+               
+                //oscillator.stop(audioCtx.currentTime + 1); // 0.2 seconds beep
+            }
+
+            function reminder() {
+                const now = new Date();
+                now.setFullYear(1970, 0, 1); // Just to compare times
+
+                if (now >= start && now <= end) {
+                    reminderMessage.textContent = `It's now ${now.toLocaleTimeString()}`;
+                    beep();
+                }
+
+                if (now < end) {
+                    setTimeout(reminder, interval);
+                }
+            }
+
+            const initialDelay = start - new Date();
+            if (initialDelay > 0) {
+                setTimeout(reminder, initialDelay);
+            } else {
+                reminder();
+            }
+        }
+
+        // Example usage: 
+        startReminder("01:50", "12:00");
+    </script>
+</body>
+</html>
